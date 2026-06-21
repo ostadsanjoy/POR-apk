@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Observation Records</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0a090c;
+            --accent: #07393c;
+            --secondary: #2c666e;
+            --highlight: rgba(144, 221, 240, 0.4);
+            --surface: rgba(255, 255, 255, 0.55);
+            --border-white: rgba(255, 255, 255, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: url('photo/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--primary);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 540px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 24px 60px rgba(10, 9, 12, 0.2);
+            background-color: rgba(240, 237, 238, 0.12);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+        }
+
+        @media(min-width: 768px) {
+            body {
+                padding: 40px 20px;
+            }
+            .phone-container {
+                min-height: calc(100vh - 80px);
+                border-radius: 32px;
+                border: 1px solid var(--border-white);
+            }
+        }
+
+        header {
+            margin: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-white);
+            border-radius: 20px;
+            background-color: var(--surface);
+            position: sticky;
+            top: 16px;
+            z-index: 10;
+            box-shadow: 0 8px 32px rgba(7, 57, 60, 0.05);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .icon-btn:active {
+            background-color: var(--highlight);
+            transform: scale(0.92);
+        }
+
+        .text-sort-btn {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .search-bar-container {
+            display: none;
+            margin-top: 14px;
+        }
+
+        .search-bar-container.active {
+            display: block;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-white);
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.4);
+            color: var(--primary);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 0 16px 80px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .directory-layout-wrapper {
+            display: flex;
+            gap: 14px;
+            width: 100%;
+            align-items: flex-start;
+            flex: 1;
+        }
+
+        #records-list {
+            flex: 1;
+        }
+
+        .alphabetical-scroll {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--secondary);
+            text-align: center;
+            user-select: none;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--border-white);
+            padding: 8px 4px;
+            border-radius: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            position: sticky;
+            top: 120px;
+            width: 26px;
+            z-index: 5;
+        }
+
+        .alphabetical-scroll span {
+            cursor: pointer;
+            display: block;
+            width: 16px;
+            height: 16px;
+            line-height: 16px;
+            border-radius: 50%;
+            transition: all 0.15s ease;
+        }
+
+        .alphabetical-scroll span.active {
+            background-color: var(--accent);
+            color: var(--surface);
+        }
+
+        .record-card {
+            background: var(--surface);
+            border: 1px solid var(--border-white);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(7, 57, 60, 0.03);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .record-card:active {
+            transform: scale(0.97);
+            background-color: var(--highlight);
+        }
+
+        .avatar-initial {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--border-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
+        .card-meta {
+            font-size: 13px;
+            color: var(--secondary);
+            font-weight: 400;
+        }
+
+        .fab-btn-holder {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 100;
+        }
+
+        .fab-btn {
+            background-color: var(--accent);
+            color: #ffffff;
+            border: none;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            font-size: 28px;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(7, 57, 60, 0.35);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .fab-btn:active {
+            transform: scale(0.92);
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            flex: 1;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .form-island {
+            background: var(--surface);
+            border: 1px solid var(--border-white);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(10, 9, 12, 0.04);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--secondary);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-white);
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: var(--primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--secondary);
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(7, 57, 60, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--border-white);
+            color: var(--secondary);
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--border-white);
+            border-radius: 14px;
+            margin: 0 16px 12px 16px;
+            padding: 4px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--secondary);
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.25s ease;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            background-color: var(--surface);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        .tab-panel {
+            display: none;
+            padding: 0 16px;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .detail-card {
+            background: var(--surface);
+            border: 1px solid var(--border-white);
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 8px 32px rgba(7, 57, 60, 0.03);
+        }
+
+        .detail-item {
+            margin-bottom: 18px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            color: var(--primary);
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .observation-item {
+            background: var(--surface);
+            border: 1px solid var(--border-white);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.02);
+        }
+
+        .obs-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--secondary);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .obs-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .obs-tags {
+            margin-top: 10px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tag-chip {
+            font-size: 11px;
+            font-weight: 500;
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--border-white);
+            padding: 3px 10px;
+            border-radius: 20px;
+            color: var(--secondary);
+        }
+
+        .form-custom-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .form-custom-remove-btn {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+
+        .add-field-trigger {
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px dashed var(--secondary);
+            padding: 8px 14px;
+            border-radius: 8px;
+            color: var(--accent);
+            cursor: pointer;
+            margin-top: 4px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-container">
+
+    <!-- SCREEN 1: HOME DIRECTORY -->
+    <div id="screen-home" class="screen active">
+        <header>
+            <div class="header-top">
+                <h1> Personal Observation Records</h1>
+                <div class="header-actions">
+                    <button class="icon-btn text-sort-btn" onclick="toggleSort()" title="Sort Order">A↕</button>
+                    <button class="icon-btn" onclick="toggleSearch()" title="Search">
+                        <svg viewBox="0 0 512 512"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0s208 93.1 208 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="search-bar-container" id="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Search profiles..." oninput="renderRecords()">
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="directory-layout-wrapper">
+                <div id="records-list"></div>
+                <div class="alphabetical-scroll" id="alpha-wheel"></div>
+            </div>
+        </div>
+
+        <div class="fab-btn-holder">
+            <button class="fab-btn" onclick="openAddScreen()">+</button>
+        </div>
+    </div>
+
+
+    <!-- SCREEN 2: ADD/EDIT FORM -->
+    <div id="screen-add-record" class="screen">
+        <header>
+            <div class="header-top">
+                <h1 id="form-title">Add New Data</h1>
+            </div>
+        </header>
+        <div class="main-content">
+            <div class="form-island">
+                <form id="record-form" onsubmit="saveRecord(event)">
+                    <input type="hidden" id="form-id">
+                    <div class="form-group"><label>Name</label><input type="text" id="form-name" required></div>
+                    <div class="form-group"><label>Phone</label><input type="tel" id="form-phone"></div>
+                    <div class="form-group"><label>Known Since</label><input type="date" id="form-date"></div>
+                    <div class="form-group">
+                        <label>Relation</label>
+                        <select id="form-relation">
+                            <option value="Junior">Junior</option>
+                            <option value="Friend">Friend</option>
+                            <option value="Colleague">Colleague</option>
+                            <option value="Acquaintance">Acquaintance</option>
+                            <option value="Mentor">Mentor</option>
+                            <option value="Senior">Senior</option>
+                            <option value="Professor">Professor</option>
+                            <option value="Parent">Parent</option>
+                            <option value="Teacher">Teacher</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Skill</label><input type="text" id="form-skill"></div>
+                    <div class="form-group"><label>Address</label><input type="text" id="form-address"></div>
+                    <div class="form-group"><label>Remarks</label><textarea id="form-remarks" rows="2"></textarea></div>
+                    <div class="form-group"><label>Tags (Comma separated)</label><input type="text" id="form-tags"></div>
+
+                    <div class="form-group" style="border-top: 1px solid var(--border-white); padding-top: 16px; margin-top: 20px;">
+                        <label>Other Details</label>
+                        <div id="form-custom-fields-area"></div>
+                        <button type="button" class="add-field-trigger" onclick="appendCustomFieldRow('', '')">+ Add Detail Row</button>
+                    </div>
+
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SCREEN 3: RECORD DETAIL VIEW -->
+    <div id="screen-view-record" class="screen">
+        <header style="padding-bottom: 20px; margin-bottom: 12px;">
+            <div class="header-top">
+                <button class="icon-btn" onclick="navigate('screen-home')" style="font-size: 20px; font-weight:600;">←</button>
+                <h1 id="view-title-name">-</h1>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="editRecord()" title="Edit">
+                        <svg viewBox="0 0 512 512"><path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.8 74.4 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7 14.3-32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/></svg>
+                    </button>
+                    <button class="icon-btn" onclick="deleteRecord()" title="Delete">
+                        <svg viewBox="0 0 448 512"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" id="tab-details" onclick="switchTab('details')">Details</div>
+            <div class="tab" id="tab-observations" onclick="switchTab('observations')">Observation</div>
+        </div>
+
+        <div id="panel-details" class="tab-panel active">
+            <div class="detail-card">
+                <div class="detail-item"><div class="detail-label">Name</div><div class="detail-value" id="view-name">-</div></div>
+                <div class="detail-item"><div class="detail-label">Phone</div><div class="detail-value" id="view-phone">-</div></div>
+                <div class="detail-item"><div class="detail-label">Known Since</div><div class="detail-value" id="view-date">-</div></div>
+                <div class="detail-item"><div class="detail-label">Relation</div><div class="detail-value" id="view-relation">-</div></div>
+                <div class="detail-item"><div class="detail-label">Skills</div><div class="detail-value" id="view-skills">-</div></div>
+                <div class="detail-item"><div class="detail-label">Address</div><div class="detail-value" id="view-address">-</div></div>
+                <div class="detail-item"><div class="detail-label">Remarks</div><div class="detail-value" id="view-remarks">-</div></div>
+                <div class="detail-item"><div class="detail-label">Tags</div><div class="obs-tags" id="view-tags"></div></div>
+                
+                <div style="margin-top: 24px; border-top: 1px solid var(--border-white); padding-top: 16px;">
+                    <div class="detail-label" style="margin-bottom: 12px;">Other Details</div>
+                    <div id="custom-fields-area"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-observations" class="tab-panel">
+            <div id="observation-timeline"></div>
+        </div>
+
+        <div class="fab-btn-holder" id="obs-footer" style="display:none;">
+            <button class="fab-btn" onclick="navigate('screen-add-observation')">+</button>
+        </div>
+    </div>
+
+
+    <!-- SCREEN 4: ADD OBSERVATION -->
+    <div id="screen-add-observation" class="screen">
+        <header>
+            <div class="header-top">
+                <h1>Add Observation</h1>
+            </div>
+        </header>
+        <div class="main-content">
+            <div class="form-island">
+                <form id="observation-form" onsubmit="saveObservation(event)">
+                    <div class="form-group"><label>Observation</label><textarea id="obs-form-text" rows="4" required></textarea></div>
+                    <div class="form-group"><label>Date</label><input type="date" id="obs-form-date" required></div>
+                    <div class="form-group"><label>Context</label><input type="text" id="obs-form-context"></div>
+                    <div class="form-group"><label>Tags</label><input type="text" id="obs-form-tags"></div>
+
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-secondary" onclick="backToRecord()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Observation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Empty database arrays setup waiting your operational records logging
+    let records = JSON.parse(localStorage.getItem('observation_records')) || [];
+    let currentRecordId = null;
+    let sortAscending = true;
+    let selectedLetter = null;
+
+    function initAlphaWheel() {
+        const wheel = document.getElementById('alpha-wheel');
+        wheel.innerHTML = '';
+        for (let i = 65; i <= 90; i++) {
+            const letter = String.fromCharCode(i);
+            const span = document.createElement('span');
+            span.textContent = letter;
+            span.id = `alpha-${letter}`;
+            span.onclick = () => filterLetter(letter);
+            wheel.appendChild(span);
+        }
+    }
+
+    function filterLetter(letter) {
+        document.querySelectorAll('.alphabetical-scroll span').forEach(s => s.classList.remove('active'));
+        if (selectedLetter === letter) {
+            selectedLetter = null;
+        } else {
+            selectedLetter = letter;
+            document.getElementById(`alpha-${letter}`).classList.add('active');
+        }
+        renderRecords();
+    }
+
+    function navigate(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        if(screenId === 'screen-home') renderRecords();
+    }
+
+    function toggleSearch() {
+        document.getElementById('search-container').classList.toggle('active');
+    }
+
+    function toggleSort() {
+        sortAscending = !sortAscending;
+        renderRecords();
+    }
+
+    function renderRecords() {
+        const listContainer = document.getElementById('records-list');
+        const query = document.getElementById('search-input').value.toLowerCase();
+        
+        let filtered = records.filter(r => {
+            const matchSearch = r.name.toLowerCase().includes(query) || r.relation.toLowerCase().includes(query);
+            const matchAlpha = selectedLetter ? r.name.trim().toUpperCase().startsWith(selectedLetter) : true;
+            return matchSearch && matchAlpha;
+        });
+
+        filtered.sort((a, b) => sortAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+
+        listContainer.innerHTML = '';
+        if(filtered.length === 0) {
+            listContainer.innerHTML = `<div style="text-align:center; color:var(--primary); background: var(--surface); border: 1px solid var(--border-white); padding: 24px; border-radius: 16px; margin-top:20px; font-size:14px; font-weight:500;">No records found. Tap + down below to begin.</div>`;
+            return;
+        }
+
+        filtered.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'record-card';
+            card.onclick = () => viewRecord(item.id);
+            card.innerHTML = `
+                <div class="avatar-initial">${item.name.charAt(0)}</div>
+                <div class="card-info">
+                    <div class="card-name">${item.name}</div>
+                    <div class="card-meta">${item.relation} • ${item.address || 'No Location'}</div>
+                </div>
+            `;
+            listContainer.appendChild(card);
+        });
+    }
+
+    function appendCustomFieldRow(key = '', val = '') {
+        const container = document.getElementById('form-custom-fields-area');
+        const row = document.createElement('div');
+        row.className = 'form-custom-row';
+        row.innerHTML = `
+            <input type="text" class="custom-key" placeholder="Label" value="${key}" style="flex: 1;">
+            <input type="text" class="custom-value" placeholder="Value" value="${val}" style="flex: 1.5;">
+            <button type="button" class="form-custom-remove-btn" onclick="this.parentElement.remove()">✕</button>
+        `;
+        container.appendChild(row);
+    }
+
+    function openAddScreen() {
+        document.getElementById('form-title').innerText = "Add New Data";
+        document.getElementById('record-form').reset();
+        document.getElementById('form-id').value = "";
+        document.getElementById('form-custom-fields-area').innerHTML = "";
+        navigate('screen-add-record');
+    }
+
+    function editRecord() {
+        const record = records.find(r => r.id === currentRecordId);
+        if(!record) return;
+
+        document.getElementById('form-title').innerText = "Edit Record";
+        document.getElementById('form-id').value = record.id;
+        document.getElementById('form-name').value = record.name;
+        document.getElementById('form-phone').value = record.phone || '';
+        document.getElementById('form-date').value = record.date || '';
+        document.getElementById('form-relation').value = record.relation;
+        document.getElementById('form-skill').value = record.skill || '';
+        document.getElementById('form-address').value = record.address || '';
+        document.getElementById('form-remarks').value = record.remarks || '';
+        document.getElementById('form-tags').value = record.tags ? record.tags.join(', ') : '';
+
+        const customFormArea = document.getElementById('form-custom-fields-area');
+        customFormArea.innerHTML = "";
+        if (record.customData) {
+            for (let key in record.customData) {
+                appendCustomFieldRow(key, record.customData[key]);
+            }
+        }
+
+        navigate('screen-add-record');
+    }
+
+    function deleteRecord() {
+        if(confirm("Delete this profile data permanently?")) {
+            records = records.filter(r => r.id !== currentRecordId);
+            saveData();
+            navigate('screen-home');
+        }
+    }
+
+    function cancelForm() {
+        if(document.getElementById('form-id').value) viewRecord(currentRecordId);
+        else navigate('screen-home');
+    }
+
+    function saveRecord(e) {
+        e.preventDefault();
+        const id = document.getElementById('form-id').value;
+        const tags = document.getElementById('form-tags').value.split(',').map(t => t.trim()).filter(t => t);
+
+        const customDataObj = {};
+        const rows = document.querySelectorAll('.form-custom-row');
+        rows.forEach(row => {
+            const k = row.querySelector('.custom-key').value.trim();
+            const v = row.querySelector('.custom-value').value.trim();
+            if(k && v) {
+                customDataObj[k] = v;
+            }
+        });
+
+        if(id) {
+            const idx = records.findIndex(r => r.id == id);
+            if(idx !== -1) {
+                records[idx].name = document.getElementById('form-name').value;
+                records[idx].phone = document.getElementById('form-phone').value;
+                records[idx].date = document.getElementById('form-date').value;
+                records[idx].relation = document.getElementById('form-relation').value;
+                records[idx].skill = document.getElementById('form-skill').value;
+                records[idx].address = document.getElementById('form-address').value;
+                records[idx].remarks = document.getElementById('form-remarks').value;
+                records[idx].tags = tags;
+                records[idx].customData = customDataObj;
+            }
+            saveData();
+            viewRecord(parseInt(id));
+        } else {
+            const nr = {
+                id: Date.now(),
+                name: document.getElementById('form-name').value,
+                phone: document.getElementById('form-phone').value,
+                date: document.getElementById('form-date').value,
+                relation: document.getElementById('form-relation').value,
+                skill: document.getElementById('form-skill').value,
+                address: document.getElementById('form-address').value,
+                remarks: document.getElementById('form-remarks').value,
+                tags: tags,
+                observations: [],
+                customData: customDataObj
+            };
+            records.push(nr);
+            saveData();
+            navigate('screen-home');
+        }
+    }
+
+    function viewRecord(id) {
+        currentRecordId = id;
+        const rec = records.find(r => r.id === id);
+        if(!rec) return;
+
+        document.getElementById('view-title-name').innerText = rec.name;
+        document.getElementById('view-name').innerText = rec.name;
+        document.getElementById('view-phone').innerText = rec.phone || 'None';
+        document.getElementById('view-date').innerText = rec.date || 'None';
+        document.getElementById('view-relation').innerText = rec.relation;
+        document.getElementById('view-skills').innerText = rec.skill || 'None';
+        document.getElementById('view-address').innerText = rec.address || 'None';
+        document.getElementById('view-remarks').innerText = rec.remarks || 'None';
+
+        const tagsWrap = document.getElementById('view-tags');
+        tagsWrap.innerHTML = '';
+        if(rec.tags) {
+            rec.tags.forEach(t => { tagsWrap.innerHTML += `<span class="tag-chip">${t}</span>`; });
+        }
+
+        const customArea = document.getElementById('custom-fields-area');
+        customArea.innerHTML = '';
+        if(rec.customData && Object.keys(rec.customData).length > 0) {
+            for(let key in rec.customData) {
+                const row = document.createElement('div');
+                row.className = 'detail-item';
+                row.innerHTML = `
+                    <div class="detail-label">${key}</div>
+                    <div class="detail-value">${rec.customData[key]}</div>
+                `;
+                customArea.appendChild(row);
+            }
+        } else {
+            customArea.innerHTML = `<div style="font-size:13px; color:var(--secondary); font-style:italic;">None recorded. Use edit form to manage dynamic attributes.</div>`;
+        }
+
+        renderObservations(rec);
+        switchTab('details');
+        navigate('screen-view-record');
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+        document.getElementById(`panel-${tabName}`).classList.add('active');
+        document.getElementById('obs-footer').style.display = tabName === 'observations' ? 'flex' : 'none';
+    }
+
+    function renderObservations(rec) {
+        const container = document.getElementById('observation-timeline');
+        container.innerHTML = '';
+        if(!rec.observations || rec.observations.length === 0) {
+            container.innerHTML = `<div style="text-align:center; color:var(--primary); background: var(--surface); border: 1px solid var(--border-white); padding: 24px; border-radius: 16px; font-size:13px; font-weight:500;">No observation history linked. Tap + below.</div>`;
+            return;
+        }
+        rec.observations.forEach((obs, index) => {
+            const div = document.createElement('div');
+            div.className = 'observation-item';
+            let chips = '';
+            if(obs.tags) { obs.tags.forEach(t => { chips += `<span class="tag-chip">${t}</span>`; }); }
+            div.innerHTML = `
+                <div class="obs-header"><span>Obs #${index+1} (${obs.context || 'General'})</span><span>${obs.date}</span></div>
+                <div class="obs-text">${obs.text}</div>
+                <div class="obs-tags">${chips}</div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function saveObservation(e) {
+        e.preventDefault();
+        const idx = records.findIndex(r => r.id === currentRecordId);
+        if(idx === -1) return;
+
+        const obs = {
+            date: document.getElementById('obs-form-date').value,
+            context: document.getElementById('obs-form-context').value,
+            text: document.getElementById('obs-form-text').value,
+            tags: document.getElementById('obs-form-tags').value.split(',').map(t => t.trim()).filter(t => t)
+        };
+
+        if(!records[idx].observations) records[idx].observations = [];
+        records[idx].observations.push(obs);
+        saveData();
+        document.getElementById('observation-form').reset();
+        viewRecord(currentRecordId);
+        switchTab('observations');
+    }
+
+    function backToRecord() {
+        viewRecord(currentRecordId);
+        switchTab('observations');
+    }
+
+    function saveData() {
+        localStorage.setItem('observation_records', JSON.stringify(records));
+    }
+
+    initAlphaWheel();
+    renderRecords();
+</script>
+
+</body>
+</html>

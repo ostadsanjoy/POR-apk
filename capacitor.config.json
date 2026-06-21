@@ -1,0 +1,9 @@
+{
+  "appId": "com.ostadsanjoy.por",
+  "appName": "Personal Observation Records",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": true
+  }
+}
